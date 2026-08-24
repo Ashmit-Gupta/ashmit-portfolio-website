@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+.git
+.env
+.env.*
+*.pem
+*.key
+.claude
+.cursor
+ashmit work log.txt
+*.md

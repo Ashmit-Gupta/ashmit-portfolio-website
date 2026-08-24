@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+:root {
+  --background: #0b0b0c;
+  --foreground: #f3eee4;
+  --muted: #9a9388;
+  --accent: #c9a36a;
+  --accent-fg: #14110c;
+  --surface: #141416;
+  --line: rgba(243, 238, 228, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
+}
+
+html {
+  color-scheme: dark;
+  background: var(--background);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.site-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+@keyframes orb-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+.orb-breathe {
+  animation: orb-breathe 16s ease-in-out infinite;
+}
+
+.orb-breathe-delayed {
+  animation-delay: -5s;
+}
+
+.orb-breathe-slow {
+  animation-duration: 22s;
+  animation-delay: -11s;
+}
+
+@keyframes hero-network-flow {
+  to {
+    stroke-dashoffset: -48;
+  }
+}
+
+@keyframes hero-orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-node-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.hero-flow-line,
+.hero-flow-line-slow,
+.hero-flow-line-out {
+  stroke-dasharray: 5 11;
+  animation: hero-network-flow 2.6s linear infinite;
+}
+
+.hero-flow-line-slow {
+  animation-duration: 4.2s;
+  animation-direction: reverse;
+}
+
+.hero-flow-line-out {
+  animation-duration: 1.9s;
+}
+
+.hero-orbit {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: hero-orbit-spin 52s linear infinite;
+}
+
+.hero-node-pulse {
+  animation: hero-node-pulse 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  .orb-breathe,
+  .hero-flow-line,
+  .hero-flow-line-slow,
+  .hero-flow-line-out,
+  .hero-orbit,
+  .hero-node-pulse {
+    animation: none;
+  }
+
+  .hero-flow-line,
+  .hero-flow-line-slow,
+  .hero-flow-line-out {
+    stroke-dasharray: none;
+  }
+
+  .hero-packet {
+    display: none;
+  }
+}
