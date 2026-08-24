@@ -1,0 +1,10 @@
+{
+  // Static HTML export — do not use OpenNext. This site has no Node server.
+  "name": "ashmit-portfolio-website",
+  "compatibility_date": "2026-08-24",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page",
+    "html_handling": "force-trailing-slash"
+  }
+}
