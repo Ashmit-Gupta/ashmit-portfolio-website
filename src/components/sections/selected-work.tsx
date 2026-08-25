@@ -43,8 +43,8 @@ export function SelectedWork({ projects }: { projects: CaseStudyProject[] }) {
       <Container>
         <SectionHeading
           kicker="Selected work"
-          title="Four pieces worth sitting with"
-          description="Industrial IoT, on-device liveness, a retrieval lab on EKS, and the DevSecOps path that ships the rest."
+          title="Shipped without a company behind it"
+          description="A retrieval lab on EKS and a Flutter app that made it to the Play Store, both built and shipped on my own time."
         />
         <StaggerIn className="mt-12 grid gap-4 md:grid-cols-2">
           {projects.map((project) => (

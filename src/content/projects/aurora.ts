@@ -24,7 +24,6 @@ export const aurora: CaseStudyProject = {
     { label: "Map frame rate", value: "52 FPS" },
     { label: "Release pipeline", value: "12 min" },
   ],
-  featured: true,
   sections: [
     {
       id: "context",

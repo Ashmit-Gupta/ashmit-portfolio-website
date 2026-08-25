@@ -10,7 +10,8 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://ashmit.xyz",
   description:
     "Software engineer building production mobile apps in Flutter, on-device AI/ML, and AWS cloud infrastructure with Terraform and Kubernetes.",
-  headline: "If it's not in production, it's a blog post.",
+  headline:
+    "Software Engineer who builds the product and the platform it runs on.",
   lede:
-    "1.5+ years shipping Flutter apps to production, on-device ML inference, and AWS infrastructure with Terraform and Kubernetes. Currently building industrial IoT platforms at IEnergy Digital.",
+    "2 years shipping mobile apps, AI systems, and the cloud infrastructure behind them.",
 } as const;

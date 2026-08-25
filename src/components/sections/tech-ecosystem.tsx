@@ -9,7 +9,7 @@ export function TechEcosystem() {
       <Container>
         <SectionHeading
           kicker="Stack"
-          title="Tools I actually ship with"
+          title="Technologies I work with"
           description="Grouped by the work, not a logo wall."
         />
         <div className="mt-12 grid gap-10 md:grid-cols-3">

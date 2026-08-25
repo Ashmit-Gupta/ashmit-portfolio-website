@@ -22,7 +22,6 @@ export const faceLivenessPipeline: CaseStudyProject = {
     { label: "Latency before", value: "6s" },
     { label: "Invalid captures", value: "−90%" },
   ],
-  featured: true,
   lensOverrides: [
     {
       domain: "ai",

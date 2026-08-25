@@ -2,8 +2,9 @@ import Image from "next/image";
 
 const CX = 320;
 const CY = 320;
-const HUB_R = 170;
-const NODE_R = 230;
+const HUB_R = 156;
+const NODE_R = 212;
+const PORTRAIT_INSET = 0.16;
 
 type Node = {
   id: string;
@@ -15,11 +16,11 @@ type Node = {
 
 const NODES: Node[] = [
   { id: "architecture", label: "ARCHITECTURE", sub: "system design", deg: 0, anchor: "middle" },
-  { id: "engineering", label: "ENGINEERING", sub: "software", deg: 58, anchor: "start" },
-  { id: "deployment", label: "DEPLOYMENT", sub: "production", deg: 122, anchor: "start" },
-  { id: "scale", label: "SCALE", sub: "infrastructure", deg: 180, anchor: "middle" },
-  { id: "optimization", label: "OPTIMIZATION", sub: "performance", deg: 238, anchor: "end" },
-  { id: "automation", label: "AUTOMATION", sub: "CI/CD", deg: 302, anchor: "end" },
+  { id: "ai-systems", label: "AI SYSTEMS", sub: "ML · RAG · inference", deg: 58, anchor: "start" },
+  { id: "deployment", label: "DEPLOYMENT", sub: "cloud · Kubernetes", deg: 122, anchor: "start" },
+  { id: "reliability", label: "RELIABILITY", sub: "scale · observability", deg: 180, anchor: "middle" },
+  { id: "automation", label: "AUTOMATION", sub: "CI/CD · IaC", deg: 238, anchor: "end" },
+  { id: "applications", label: "APPLICATIONS", sub: "mobile & full-stack", deg: 302, anchor: "end" },
 ];
 
 function polar(deg: number, radius: number) {
@@ -37,6 +38,9 @@ function labelPoint(node: Node) {
 }
 
 export function HeroNetwork() {
+  const portraitRadius = 320 * (1 - PORTRAIT_INSET * 2);
+  const frameRadius = portraitRadius + 12;
+
   const spokes = NODES.map((node) => ({
     id: node.id,
     from: polar(node.deg, HUB_R),
@@ -54,13 +58,13 @@ export function HeroNetwork() {
       <div className="relative aspect-square w-full">
         <svg
           viewBox="0 0 640 640"
-          className="absolute inset-0 h-full w-full overflow-visible"
+          className="absolute inset-0 z-0 h-full w-full overflow-visible"
           aria-hidden="true"
         >
           <defs>
             <radialGradient id="hero-hub-glow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#c9a36a" stopOpacity="0.28" />
-              <stop offset="62%" stopColor="#c9a36a" stopOpacity="0.06" />
+              <stop offset="0%" stopColor="#c9a36a" stopOpacity="0.38" />
+              <stop offset="55%" stopColor="#c9a36a" stopOpacity="0.12" />
               <stop offset="100%" stopColor="#c9a36a" stopOpacity="0" />
             </radialGradient>
             <filter id="hero-node-glow" x="-80%" y="-80%" width="260%" height="260%">
@@ -72,18 +76,20 @@ export function HeroNetwork() {
             </filter>
           </defs>
 
-          <circle cx={CX} cy={CY} r="278" fill="url(#hero-hub-glow)" />
+          <g className="hero-hub-breathe">
+            <circle cx={CX} cy={CY} r="268" fill="url(#hero-hub-glow)" />
+          </g>
 
           <g className="hero-orbit">
             <circle
               cx={CX}
               cy={CY}
-              r="200"
+              r={frameRadius}
               fill="none"
               stroke="#c9a36a"
-              strokeOpacity="0.18"
-              strokeWidth="0.8"
-              strokeDasharray="3 10"
+              strokeOpacity="0.38"
+              strokeWidth="1"
+              strokeDasharray="4 9"
             />
           </g>
 
@@ -95,7 +101,7 @@ export function HeroNetwork() {
                 y1={line.from.y}
                 x2={line.to.x}
                 y2={line.to.y}
-                strokeOpacity="0.28"
+                strokeOpacity="0.24"
                 strokeWidth="0.9"
                 className={index % 2 === 0 ? "hero-flow-line" : "hero-flow-line-slow"}
               />
@@ -107,7 +113,7 @@ export function HeroNetwork() {
                 y1={line.from.y}
                 x2={line.to.x}
                 y2={line.to.y}
-                strokeOpacity="0.42"
+                strokeOpacity="0.36"
                 strokeWidth="1.1"
                 className={index % 2 === 0 ? "hero-flow-line-out" : "hero-flow-line"}
               />
@@ -175,22 +181,22 @@ export function HeroNetwork() {
           })}
         </svg>
 
-        <div className="absolute inset-[22%] rounded-full bg-[linear-gradient(180deg,rgba(201,163,106,0.85),rgba(201,163,106,0.18))] p-[2px] shadow-[0_0_56px_rgba(201,163,106,0.28)]">
+        <div
+          className="hero-portrait-ring absolute z-10 rounded-full bg-[linear-gradient(180deg,rgba(201,163,106,0.88),rgba(201,163,106,0.22))] p-px shadow-[0_0_52px_rgba(201,163,106,0.32)]"
+          style={{ inset: `${PORTRAIT_INSET * 100}%` }}
+        >
           <div className="relative h-full w-full overflow-hidden rounded-full bg-surface ring-1 ring-foreground/15">
             <Image
               src="/images/ashmit-portrait.webp"
               alt="Ashmit Gupta, arms folded, looking slightly to the side"
               fill
-              className="object-cover object-[50%_22%]"
+              className="scale-[1.08] object-cover object-[50%_18%]"
               sizes="(max-width: 1024px) 280px, 360px"
               preload
             />
           </div>
         </div>
       </div>
-      <figcaption className="mt-5 text-center font-mono text-[11px] tracking-[0.18em] text-muted uppercase">
-        Architecting software · engineering systems · scaling infrastructure
-      </figcaption>
     </figure>
   );
 }

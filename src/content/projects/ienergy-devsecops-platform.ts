@@ -26,7 +26,6 @@ export const ienergyDevsecopsPlatform: CaseStudyProject = {
     { label: "Terraform modules", value: "7" },
     { label: "Hosted services", value: "8+" },
   ],
-  featured: true,
   sections: [
     {
       id: "context",

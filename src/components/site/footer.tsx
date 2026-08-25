@@ -7,12 +7,13 @@ export function SiteFooter() {
     <footer className="border-t border-line">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-8">
         <div>
-          <Link href={routes.home} className="font-display text-xl">
+          <Link
+            href={routes.home}
+            className="font-display text-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
             {site.name}
           </Link>
-          <p className="mt-2 text-sm text-muted">
-            {site.role}
-          </p>
+          <p className="mt-2 text-sm text-muted">{site.role}</p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
           {navLinks.map((link) => (

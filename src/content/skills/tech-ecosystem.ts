@@ -4,7 +4,7 @@ export const techEcosystem: { domain: Domain; label: string; items: string[] }[]
   [
     {
       domain: "mobile",
-      label: "Mobile",
+      label: "Applications",
       items: [
         "Flutter",
         "Dart",
@@ -18,7 +18,7 @@ export const techEcosystem: { domain: Domain; label: string; items: string[] }[]
     },
     {
       domain: "ai",
-      label: "AI / ML",
+      label: "AI Systems",
       items: [
         "ONNX Runtime",
         "ML Kit",
@@ -32,7 +32,7 @@ export const techEcosystem: { domain: Domain; label: string; items: string[] }[]
     },
     {
       domain: "cloud",
-      label: "Cloud",
+      label: "Cloud & Infrastructure",
       items: [
         "AWS",
         "Terraform",

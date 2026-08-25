@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ContactSection } from "@/components/sections/contact";
-import { DomainTeasers } from "@/components/sections/domain-teasers";
+import { ExperienceSection } from "@/components/sections/experience";
 import { HeroSection } from "@/components/sections/hero";
 import { MethodologySection } from "@/components/sections/methodology";
 import { MetricsBand } from "@/components/sections/metrics-band";
@@ -23,7 +23,7 @@ export default function Home() {
     <>
       <HeroSection />
       <MetricsBand />
-      <DomainTeasers />
+      <ExperienceSection />
       <SelectedWork projects={featuredProjects} />
       <MethodologySection />
       <TechEcosystem />

@@ -6,12 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { routes } from "@/lib/constants/routes";
 import { site } from "@/lib/constants/site";
+import { gsap } from "@/lib/animations/gsap-config";
 import { easeOut } from "@/lib/animations/motion-variants";
 import { useReducedMotion } from "@/lib/animations/use-reduced-motion";
 import { cn } from "@/lib/utils/cn";
 import { Logomark } from "@/components/site/logomark";
 
-const SCROLL_THRESHOLD_PX = 100;
+const SCROLL_ON_PX = 100;
+const SCROLL_OFF_PX = 56;
 
 const headerNav = [
   { href: routes.mobile, label: "Mobile" },
@@ -47,7 +49,6 @@ export function SiteHeader() {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -55,18 +56,21 @@ export function SiteHeader() {
   }, [pathname]);
 
   useEffect(() => {
-    const node = sentinelRef.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setScrolled(!entry.isIntersecting);
-      },
-      { threshold: 0 },
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
+    const update = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      setScrolled((prev) => {
+        if (!prev && y > SCROLL_ON_PX) return true;
+        if (prev && y < SCROLL_OFF_PX) return false;
+        return prev;
+      });
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    gsap.ticker.add(update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      gsap.ticker.remove(update);
+    };
   }, []);
 
   useEffect(() => {
@@ -97,34 +101,20 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  const compact = scrolled || open;
-
   return (
     <>
-      <div
-        ref={sentinelRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-0 w-px"
-        style={{ height: SCROLL_THRESHOLD_PX }}
-      />
       <header
         className={cn(
           "header-enter sticky top-0 z-50 w-full border-b",
           reduced
             ? undefined
             : "transition-[background-color,border-color,box-shadow] duration-300 ease-out",
-          compact
+          scrolled
             ? "border-white/10 bg-background/80 shadow-[0_12px_32px_-28px_rgba(0,0,0,0.9)] backdrop-blur-[8px]"
             : "border-white/[0.06] bg-transparent",
         )}
       >
-        <div
-          className={cn(
-            "mx-auto flex w-full max-w-6xl items-center justify-between px-5 sm:px-8",
-            reduced ? undefined : "transition-[height] duration-300 ease-out",
-            compact ? "h-14" : "h-16",
-          )}
-        >
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
           <Link
             href={routes.home}
             className="group flex min-w-0 items-center gap-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -135,12 +125,7 @@ export function SiteHeader() {
               <span className="font-display text-[15px] tracking-tight text-foreground sm:text-base">
                 {site.name}
               </span>
-              <span
-                className={cn(
-                  "mt-1 hidden font-mono text-[9px] tracking-[0.22em] text-muted uppercase sm:block",
-                  compact && "text-muted/80",
-                )}
-              >
+              <span className="mt-1 hidden font-mono text-[9px] tracking-[0.22em] text-muted uppercase sm:block">
                 {site.role}
               </span>
             </span>

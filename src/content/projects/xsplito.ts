@@ -10,6 +10,7 @@ export const xsplito: CaseStudyProject = {
   timeframe: "Personal project",
   stack: ["Flutter", "Riverpod", "Dio", "Firebase", "Clean Architecture"],
   metrics: [{ label: "Distribution", value: "Play Store" }],
+  featured: true,
   externalLink:
     "https://play.google.com/store/apps/details?id=com.xsplito_mobile_app",
   externalLinkLabel: "Play Store",
