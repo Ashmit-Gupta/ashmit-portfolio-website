@@ -3,6 +3,7 @@ import { DomainHero } from "@/components/sections/domain-hero";
 import { DomainProjectGrid } from "@/components/sections/domain-project-grid";
 import { domains } from "@/content/domains";
 import { getProjectsByDomain } from "@/content/projects";
+import { domainRoutes } from "@/lib/constants/routes";
 import type { Domain } from "@/types/domain";
 
 export function DomainRoute({ domain }: { domain: Domain }) {
@@ -19,5 +20,8 @@ export function domainMetadata(domain: Domain): Metadata {
   return {
     title: content.kicker,
     description: content.lede,
+    alternates: {
+      canonical: domainRoutes[domain],
+    },
   };
 }

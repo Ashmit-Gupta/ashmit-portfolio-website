@@ -11,7 +11,7 @@ export function SiteFooter() {
             {site.name}
           </Link>
           <p className="mt-2 text-sm text-muted">
-            {site.role} · {site.location}
+            {site.role}
           </p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">

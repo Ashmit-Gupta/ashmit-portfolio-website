@@ -7,10 +7,10 @@ export const site = {
   phoneHref: "tel:+919518652242",
   linkedin: "https://www.linkedin.com/in/ashmitgupta05/",
   github: "https://github.com/Ashmit-Gupta",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://ashmitgupta.dev",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://ashmit.xyz",
   description:
-    "Software engineer shipping production mobile, applied ML, and cloud systems. Flutter, on-device inference, and AWS-based delivery.",
-  headline: "I ship production systems — mobile, applied ML, and the cloud they run on.",
+    "Software engineer building production mobile apps in Flutter, on-device AI/ML, and AWS cloud infrastructure with Terraform and Kubernetes.",
+  headline: "If it's not in production, it's a blog post.",
   lede:
-    "1.5+ years building industrial IoT, on-device machine learning, and the pipelines that take them to stores. Currently at IEnergy Digital.",
+    "1.5+ years shipping Flutter apps to production, on-device ML inference, and AWS infrastructure with Terraform and Kubernetes. Currently building industrial IoT platforms at IEnergy Digital.",
 } as const;

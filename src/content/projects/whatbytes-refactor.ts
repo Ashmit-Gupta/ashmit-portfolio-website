@@ -33,7 +33,7 @@ export const whatbytesRefactor: CaseStudyProject = {
     {
       id: "result",
       heading: "Result",
-      body: "Frame rate moved from 40 to 54 FPS (~35%). Unit coverage rose ~40% because domain logic could be tested without a widget tree. The architecture is what made both numbers possible — the FPS work and the test work were the same decoupling.",
+      body: "Frame rate moved from 40 to 54 FPS (~35%). Unit coverage rose ~40% because domain logic could be tested without a widget tree. The architecture is what made both numbers possible: the FPS work and the test work were the same decoupling.",
     },
   ],
 };

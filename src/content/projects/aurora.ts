@@ -6,7 +6,7 @@ export const aurora: CaseStudyProject = {
   subtitle: "Industrial IoT platform for live machines, people, and maps",
   domains: ["mobile"],
   primaryDomain: "mobile",
-  role: "Flutter developer — architecture through production",
+  role: "Flutter developer · architecture through production",
   timeframe: "IEnergy Digital · July 2025 – Present",
   stack: [
     "Flutter",
@@ -29,12 +29,12 @@ export const aurora: CaseStudyProject = {
     {
       id: "context",
       heading: "Context",
-      body: "Aurora is the operational picture for industrial sites: 250+ machines and 3,500+ workers, tracked with GPS, BLE beacons, and live telemetry. Supervisors need a map that tells them where people and equipment are, whether a machine is healthy, and when a safety alert fires — on Android and iOS, often in the field.\n\nI designed and built the Flutter client from scratch and owned the path from architecture to store release. The product is not a dashboard demo. If the map stutters, if login fails on one OEM, if a release is blocked by Play Console, the site loses visibility.",
+      body: "Aurora is the operational picture for industrial sites: 250+ machines and 3,500+ workers, tracked with GPS, BLE beacons, and live telemetry. Supervisors need a map that tells them where people and equipment are, whether a machine is healthy, and when a safety alert fires. All of it on Android and iOS, often in the field.\n\nI designed and built the Flutter client from scratch and owned the path from architecture to store release. The product is not a dashboard demo. If the map stutters, if login fails on one OEM, if a release is blocked by Play Console, the site loses visibility.",
     },
     {
       id: "problem",
       heading: "Problem",
-      body: "The live map is the product. Hundreds of device and machine markers update continuously. A naive implementation — fetch the whole tile set, redraw every overlay every frame, treat connectivity as “Wi-Fi is on” — produces jank, memory spikes, and false offline screens.\n\nThe other class of failure is not on the map at all. Production incidents clustered around TLS, missing iOS build config, Play Store versioning, and widget-lifecycle bugs that only showed up after tab switches. The app had to be as careful about delivery and diagnosis as about pixels.",
+      body: "The live map is the product. Hundreds of device and machine markers update continuously. A naive implementation (fetch the whole tile set, redraw every overlay every frame, treat connectivity as “Wi-Fi is on”) produces jank, memory spikes, and false offline screens.\n\nThe other class of failure is not on the map at all. Production incidents clustered around TLS, missing iOS build config, Play Store versioning, and widget-lifecycle bugs that only showed up after tab switches. The app had to be as careful about delivery and diagnosis as about pixels.",
     },
     {
       id: "investigation",

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { ArchitectureDiagram } from "@/components/diagrams/architecture-diagram";
 import { FadeIn } from "@/components/motion/framer/fade-in";
+import { PinnedDiagramSequence } from "@/components/motion/gsap/pinned-diagram-sequence";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { MetricStat } from "@/components/ui/metric-stat";
@@ -136,6 +137,12 @@ export function CaseStudyTemplate({
           </div>
         ) : null}
       </Container>
+
+      {project.platformSequence ? (
+        <Container className="mt-20">
+          <PinnedDiagramSequence {...project.platformSequence} />
+        </Container>
+      ) : null}
 
       <Container className="mt-16 max-w-3xl">
         {sections.map((section) => {

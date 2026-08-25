@@ -2,7 +2,7 @@ export const methodologySteps = [
   {
     id: "measure",
     title: "Measure the real bottleneck",
-    body: "DevTools before opinions. Frame time, handshake, pipeline minutes — pick the number that is actually failing, then change one thing.",
+    body: "DevTools before opinions. Frame time, handshake, pipeline minutes: pick the number that is actually failing, then change one thing.",
   },
   {
     id: "separate",
@@ -17,6 +17,6 @@ export const methodologySteps = [
   {
     id: "layer",
     title: "Debug to the actual layer",
-    body: "Client, certificate chain, dart-define, Play Console — the bug is often one layer over from the stack trace you were handed.",
+    body: "Client, certificate chain, dart-define, Play Console: the bug is often one layer over from the stack trace you were handed.",
   },
 ] as const;

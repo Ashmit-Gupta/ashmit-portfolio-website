@@ -11,7 +11,7 @@ export const domains: Record<Domain, DomainPageContent> = {
   mobile: {
     domain: "mobile",
     kicker: "Mobile",
-    title: "Flutter in production — maps, identity, stores.",
+    title: "Flutter in production: maps, identity, stores.",
     lede: "Industrial IoT, on-device capture, store releases, and the incident work that keeps them alive. Android, iOS, tablet, and the CI that actually ships.",
   },
   ai: {

@@ -13,7 +13,7 @@ export function HeroSection() {
       <Container className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <div>
           <p className="font-mono text-xs tracking-[0.22em] text-accent uppercase">
-            {site.role} · {site.location}
+            {site.role}
           </p>
           <TextReveal
             className="mt-5 max-w-3xl font-display text-4xl leading-[1.12] text-balance sm:text-6xl"
@@ -21,7 +21,7 @@ export function HeroSection() {
           />
           <p className="mt-6 max-w-xl text-lg text-muted text-pretty">{site.lede}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={routes.mobile} className={cn(buttonVariants({ size: "lg" }))}>
+            <Link href={`${routes.home}#selected-work`} className={cn(buttonVariants({ size: "lg" }))}>
               Selected work
             </Link>
             <Link

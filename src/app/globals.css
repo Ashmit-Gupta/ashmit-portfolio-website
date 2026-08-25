@@ -27,6 +27,7 @@
 html {
   color-scheme: dark;
   background: var(--background);
+  scroll-padding-top: 4.5rem;
 }
 
 html,
@@ -153,5 +154,42 @@ body {
 
   .hero-packet {
     display: none;
+  }
+
+  .header-enter {
+    animation: none;
+  }
+}
+
+@keyframes header-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.header-enter {
+  animation: header-enter 0.3s ease-out both;
+}
+
+.logomark-svg {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .logomark-svg,
+.group:focus-visible .logomark-svg {
+  transform: scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logomark-svg {
+    transition: none;
+  }
+
+  .group:hover .logomark-svg,
+  .group:focus-visible .logomark-svg {
+    transform: none;
   }
 }

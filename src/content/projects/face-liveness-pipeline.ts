@@ -6,7 +6,7 @@ export const faceLivenessPipeline: CaseStudyProject = {
   subtitle: "On-device capture, anti-spoof, and liveness for One App",
   domains: ["ai", "mobile"],
   primaryDomain: "ai",
-  role: "Mobile / ML engineer — pipeline owner",
+  role: "Mobile / ML engineer · pipeline owner",
   timeframe: "IEnergy Digital · One App",
   stack: [
     "Flutter",

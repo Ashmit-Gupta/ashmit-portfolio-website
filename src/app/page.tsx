@@ -11,8 +11,11 @@ import { featuredProjects } from "@/content/projects";
 import { site } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
-  title: `${site.name} — ${site.role}`,
+  title: `${site.name} · ${site.role}`,
   description: site.description,
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function Home() {

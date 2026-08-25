@@ -6,7 +6,7 @@ export const xsplito: CaseStudyProject = {
   subtitle: "A Flutter expense-splitting app shipped to Play Store",
   domains: ["mobile"],
   primaryDomain: "mobile",
-  role: "Solo — design through store listing",
+  role: "Solo · design through store listing",
   timeframe: "Personal project",
   stack: ["Flutter", "Riverpod", "Dio", "Firebase", "Clean Architecture"],
   metrics: [{ label: "Distribution", value: "Play Store" }],
@@ -17,7 +17,7 @@ export const xsplito: CaseStudyProject = {
     {
       id: "context",
       heading: "Context",
-      body: "Xsplito is a personal, cross-platform expense splitter. I wanted a full path through Clean Architecture, Riverpod, and Firebase that ended in a public store listing — not a repo that only runs on my device.",
+      body: "Xsplito is a personal, cross-platform expense splitter. I wanted a full path through Clean Architecture, Riverpod, and Firebase that ended in a public store listing, not a repo that only runs on my device.",
     },
     {
       id: "implementation",

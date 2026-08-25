@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Modern AG monogram</title>
+
+  <style>
+    :root{
+      --accent:#C6A56A;
+      --main:#F1EEE8;
+    }
+
+    .stroke{
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      stroke-width:2.6;
+      stroke-dasharray:110;
+      stroke-dashoffset:110;
+      animation:draw .85s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    .a-left{animation-delay:.02s}
+    .a-right{animation-delay:.12s}
+    .bar{animation-delay:.22s}
+    .g-arc{animation-delay:.28s}
+    .g-bar{animation-delay:.43s}
+
+    .dot{
+      opacity:0;
+      transform-box:fill-box;
+      transform-origin:center;
+      animation:appear .28s cubic-bezier(.16,1,.3,1) .7s forwards;
+    }
+
+    @keyframes draw{
+      to{stroke-dashoffset:0}
+    }
+
+    @keyframes appear{
+      from{opacity:0;transform:scale(.45)}
+      to{opacity:1;transform:scale(1)}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .stroke{animation:none;stroke-dashoffset:0}
+      .dot{animation:none;opacity:1}
+    }
+  </style>
+
+  <!-- Minimal geometric A -->
+  <path class="stroke a-left" d="M14 48 L29 16" stroke="var(--main)"/>
+  <path class="stroke a-right" d="M29 16 L44 48" stroke="var(--main)"/>
+  <path class="stroke bar" d="M20.3 34.5 H37.7" stroke="var(--accent)"/>
+
+  <!-- Integrated G, intentionally open and lightweight -->
+  <path class="stroke g-arc"
+        d="M50 23
+           C47.2 18.2 41.8 15.5 36.5 16.2
+           C29.2 17.1 24.2 23.5 24.2 31
+           C24.2 39.4 30.8 46 39 46
+           C44.4 46 48.8 43.2 50.5 39"
+        stroke="var(--accent)"/>
+
+  <path class="stroke g-bar" d="M50.5 39 H40.5" stroke="var(--accent)"/>
+
+  <!-- One precise system node -->
+  <circle class="dot" cx="50.5" cy="39" r="2.15" fill="var(--accent)"/>
+</svg>

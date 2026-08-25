@@ -29,7 +29,7 @@ export function ResumePaths() {
                   <p className="mt-2 text-sm text-muted">
                     {resume.file
                       ? `Updated ${resume.updated}`
-                      : "Coming soon — Groundline is the AI case study in the meantime."}
+                      : "Coming soon. Groundline is the AI case study in the meantime."}
                   </p>
                 </div>
                 <p className="mt-8 text-sm">

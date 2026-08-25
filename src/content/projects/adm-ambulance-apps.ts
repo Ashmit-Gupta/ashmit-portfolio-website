@@ -19,7 +19,7 @@ export const admAmbulanceApps: CaseStudyProject = {
     {
       id: "implementation",
       heading: "Implementation",
-      body: "Two native Android applications on a modular architecture — operator/dispatch and field/driver. Live tracking over Server-Sent Events instead of polling. OpenStreetMap for the map surface. Firebase Auth for identity.\n\nSSE kept a persistent stream of location and status without the battery and server cost of a tight poll loop.",
+      body: "Two native Android applications on a modular architecture: operator/dispatch and field/driver. Live tracking over Server-Sent Events instead of polling. OpenStreetMap for the map surface. Firebase Auth for identity.\n\nSSE kept a persistent stream of location and status without the battery and server cost of a tight poll loop.",
     },
     {
       id: "result",

@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils/cn";
 export const metadata: Metadata = {
   title: "Resume",
   description: "Download Mobile/Flutter or Cloud/DevOps resumes for Ashmit Gupta.",
+  alternates: {
+    canonical: routes.resume,
+  },
 };
 
 export default function ResumePage() {
@@ -22,7 +25,7 @@ export default function ResumePage() {
         </p>
         <h1 className="mt-4 font-display text-4xl sm:text-6xl">Pick a cut</h1>
         <p className="mt-4 max-w-xl text-muted">
-          Two public PDFs. The AI resume is not written yet — the Groundline and
+          Two public PDFs. The AI resume is not written yet. The Groundline and
           face-liveness case studies cover that work in more depth than a page
           of bullets.
         </p>

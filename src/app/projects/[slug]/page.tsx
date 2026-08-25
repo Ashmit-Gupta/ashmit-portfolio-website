@@ -6,6 +6,7 @@ import {
   getProjectBySlug,
   projects,
 } from "@/content/projects";
+import { routes } from "@/lib/constants/routes";
 
 export const dynamicParams = false;
 
@@ -22,6 +23,9 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.subtitle,
+    alternates: {
+      canonical: routes.project(project.slug),
+    },
   };
 }
 

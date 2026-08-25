@@ -28,6 +28,25 @@ export interface CaseStudySection {
   }[];
 }
 
+export interface DiagramSequenceBeat {
+  id: string;
+  phase: string;
+  headline: string;
+  detail: string;
+  /** Omit on a beat that should read as a closing statement rather than add a new diagram node. */
+  node?: {
+    label: string;
+    meta?: string;
+  };
+}
+
+export interface DiagramSequenceContent {
+  kicker: string;
+  title: string;
+  lede: string;
+  beats: DiagramSequenceBeat[];
+}
+
 export interface CaseStudyProject {
   slug: string;
   title: string;
@@ -44,4 +63,6 @@ export interface CaseStudyProject {
   heroImage?: string;
   externalLink?: string;
   externalLinkLabel?: string;
+  /** A pinned, scroll-scrubbed sequence that builds a diagram up cumulatively beat by beat. */
+  platformSequence?: DiagramSequenceContent;
 }

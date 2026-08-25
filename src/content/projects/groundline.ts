@@ -6,7 +6,7 @@ export const groundline: CaseStudyProject = {
   subtitle: "A RAG platform for comparing retrieval strategies under control",
   domains: ["ai", "cloud"],
   primaryDomain: "ai",
-  role: "Solo — product, model plane, and AWS platform",
+  role: "Solo · product, model plane, and AWS platform",
   timeframe: "Personal project",
   stack: [
     "Python",
@@ -28,6 +28,76 @@ export const groundline: CaseStudyProject = {
     { label: "Retrieval paths", value: "2" },
   ],
   featured: true,
+  platformSequence: {
+    kicker: "Platform, beat by beat",
+    title: "The model plane, assembled from code",
+    lede: "Every piece of the AWS platform, in the order it actually gets built: provision, scope, gate, ship, verify, reconcile, observe.",
+    beats: [
+      {
+        id: "provision",
+        phase: "PROVISION",
+        headline: "Provision a custom EKS cluster with Terraform.",
+        detail: "39+ resources, three node groups. Nothing clicked in a console.",
+        node: {
+          label: "Terraform → EKS cluster",
+          meta: "39+ resources · 3 node groups",
+        },
+      },
+      {
+        id: "scope",
+        phase: "SCOPE",
+        headline: "Scope IAM per workload, not per cluster.",
+        detail:
+          "IRSA gives each service exactly the AWS access it needs, nothing shared.",
+        node: { label: "IRSA", meta: "per-workload IAM roles" },
+      },
+      {
+        id: "gate",
+        phase: "GATE",
+        headline: "Put JWT in front of the AI plane.",
+        detail:
+          "Model services stay on ClusterIP only. No token, no reach to the generator.",
+        node: { label: "JWT gate", meta: "ClusterIP only · no public LB" },
+      },
+      {
+        id: "ship",
+        phase: "SHIP",
+        headline: "Ship with GitHub Actions, not a laptop.",
+        detail: "Build, tag, push to ECR. The same path every time, for every change.",
+        node: { label: "GitHub Actions → ECR", meta: "build + push" },
+      },
+      {
+        id: "verify",
+        phase: "VERIFY",
+        headline: "Fail the path if Trivy is unhappy.",
+        detail: "A gate on the way in, not a dashboard I glance at after a breach.",
+        node: { label: "Trivy gate", meta: "scan → pass / fail" },
+      },
+      {
+        id: "reconcile",
+        phase: "RECONCILE",
+        headline: "Argo CD reconciles the cluster from Git.",
+        detail:
+          "The cluster's state is whatever is committed, not whatever someone clicked.",
+        node: { label: "Argo CD", meta: "GitOps sync" },
+      },
+      {
+        id: "observe",
+        phase: "OBSERVE",
+        headline: "Observe with Grafana.",
+        detail: "If it is not instrumented, I am debugging blind when it breaks.",
+        node: { label: "Grafana", meta: "watches what Terraform built" },
+      },
+      {
+        id: "resolve",
+        phase: "RESOLVE",
+        headline:
+          "Recreate from code, not a console session I will not remember in six months.",
+        detail:
+          "Every piece of this is reproducible. That is the actual point of the platform work.",
+      },
+    ],
+  },
   lensOverrides: [
     {
       domain: "ai",
@@ -58,7 +128,7 @@ export const groundline: CaseStudyProject = {
     {
       id: "context",
       heading: "Context",
-      body: "Groundline is a personal full-stack RAG platform: React on the front, FastAPI for the API and AI server, Ollama serving the LLM. It is not another chatbot wrapper. I built it to answer a specific question: how much does retrieval strategy matter when the model stays fixed?\n\nThis is separate from the internal documentation assistant I later built at IEnergy. Groundline is the lab — two retrieval pipelines, one model, measurable divergence. The company tool is a productized search box over KT docs.",
+      body: "Groundline is a personal full-stack RAG platform: React on the front, FastAPI for the API and AI server, Ollama serving the LLM. It is not another chatbot wrapper. I built it to answer a specific question: how much does retrieval strategy matter when the model stays fixed?\n\nThis is separate from the internal documentation assistant I later built at IEnergy. Groundline is the lab: two retrieval pipelines, one model, measurable divergence. The company tool is a productized search box over KT docs.",
     },
     {
       id: "problem",
@@ -73,7 +143,7 @@ export const groundline: CaseStudyProject = {
     {
       id: "options-considered",
       heading: "Options considered",
-      body: "Run everything in Docker Compose on a single node — faster to start, no IRSA, no GitOps, and a dead end the first time I need isolation. Put the LLM on a public GPU API — cheaper operationally, but it destroys the “same model, local weights” constraint and the cost story.\n\nManaged vector DBs would have removed Qdrant ops. They would also have mixed vendor retrieval into the experiment. I kept Qdrant and BM25 in my process so the only moving part is the retrieval strategy.",
+      body: "Run everything in Docker Compose on a single node: faster to start, no IRSA, no GitOps, but a dead end the first time I need isolation. Put the LLM on a public GPU API: cheaper operationally, but it destroys the “same model, local weights” constraint and the cost story.\n\nManaged vector DBs would have removed Qdrant ops. They would also have mixed vendor retrieval into the experiment. I kept Qdrant and BM25 in my process so the only moving part is the retrieval strategy.",
     },
     {
       id: "engineering-decision",
@@ -89,7 +159,7 @@ export const groundline: CaseStudyProject = {
     {
       id: "result",
       heading: "Result",
-      body: "I can ask the same question twice and see where vector and BM25 disagree — in sources, not in vibes. The cluster is rebuildable. The model plane is not on the public internet. Trivy is a gate, not a dashboard I glance at after a breach.\n\nThe project also taught the difference between “I can deploy Kubernetes” and “I can explain why this service is ClusterIP and that one is not.”",
+      body: "I can ask the same question twice and see where vector and BM25 disagree: in sources, not in vibes. The cluster is rebuildable. The model plane is not on the public internet. Trivy is a gate, not a dashboard I glance at after a breach.\n\nThe project also taught the difference between “I can deploy Kubernetes” and “I can explain why this service is ClusterIP and that one is not.”",
     },
     {
       id: "reflection",

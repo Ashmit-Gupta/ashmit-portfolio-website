@@ -1,97 +1,253 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { navLinks, routes } from "@/lib/constants/routes";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { routes } from "@/lib/constants/routes";
 import { site } from "@/lib/constants/site";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils/cn";
+import { easeOut } from "@/lib/animations/motion-variants";
 import { useReducedMotion } from "@/lib/animations/use-reduced-motion";
+import { cn } from "@/lib/utils/cn";
+import { Logomark } from "@/components/site/logomark";
+
+const SCROLL_THRESHOLD_PX = 100;
+
+const headerNav = [
+  { href: routes.mobile, label: "Mobile" },
+  { href: routes.ai, label: "AI / RAG" },
+  { href: routes.cloud, label: "Cloud" },
+  { href: routes.resume, label: "Resume" },
+] as const;
+
+const ctaClass =
+  "group inline-flex items-center gap-2 rounded-[2px] border border-accent/35 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-muted uppercase transition-[color,border-color,background-color] duration-300 hover:border-accent hover:bg-accent/5 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+function isActivePath(pathname: string, href: string) {
+  const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
+  return path === href;
+}
+
+function ContactCta({ className, onClick }: { className?: string; onClick?: () => void }) {
+  return (
+    <Link href={`mailto:${site.email}`} className={cn(ctaClass, className)} onClick={onClick}>
+      Get in touch
+      <span
+        aria-hidden="true"
+        className="inline-block transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+      >
+        ↗
+      </span>
+    </Link>
+  );
+}
 
 export function SiteHeader() {
-  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const reduced = useReducedMotion();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setScrolled(!entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => {
+      if (media.matches) setOpen(false);
+    };
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      menuButtonRef.current?.focus();
+    };
+
+    window.addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
+  const compact = scrolled || open;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-background/55 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link href={routes.home} className="font-display text-lg tracking-tight">
-          {site.name}
-        </Link>
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm text-muted transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href={`mailto:${site.email}`}
-            className={cn(buttonVariants({ size: "sm" }))}
-          >
-            Contact
-          </Link>
-        </nav>
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line md:hidden"
-          aria-expanded={open}
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((value) => !value)}
+    <>
+      <div
+        ref={sentinelRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-0 w-px"
+        style={{ height: SCROLL_THRESHOLD_PX }}
+      />
+      <header
+        className={cn(
+          "header-enter sticky top-0 z-50 w-full border-b",
+          reduced
+            ? undefined
+            : "transition-[background-color,border-color,box-shadow] duration-300 ease-out",
+          compact
+            ? "border-white/10 bg-background/80 shadow-[0_12px_32px_-28px_rgba(0,0,0,0.9)] backdrop-blur-[8px]"
+            : "border-white/[0.06] bg-transparent",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto flex w-full max-w-6xl items-center justify-between px-5 sm:px-8",
+            reduced ? undefined : "transition-[height] duration-300 ease-out",
+            compact ? "h-14" : "h-16",
+          )}
         >
-          <span className="flex w-4 flex-col gap-1" aria-hidden="true">
-            <span
-              className={cn(
-                "h-px w-full bg-foreground transition",
-                open && "translate-y-[5px] rotate-45",
-              )}
-            />
-            <span
-              className={cn("h-px w-full bg-foreground transition", open && "opacity-0")}
-            />
-            <span
-              className={cn(
-                "h-px w-full bg-foreground transition",
-                open && "-translate-y-[5px] -rotate-45",
-              )}
-            />
-          </span>
-        </button>
-      </div>
-      <AnimatePresence>
-        {open ? (
-          <motion.nav
-            initial={reduced ? false : { height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={reduced ? undefined : { height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-line md:hidden"
+          <Link
+            href={routes.home}
+            className="group flex min-w-0 items-center gap-3 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            aria-label={`${site.name}, ${site.role}`}
           >
-            <div className="flex flex-col gap-1 px-5 py-4">
-              {navLinks.map((link) => (
+            <Logomark className="h-9 w-9" animated={!reduced} />
+            <span className="flex min-w-0 flex-col justify-center leading-none">
+              <span className="font-display text-[15px] tracking-tight text-foreground sm:text-base">
+                {site.name}
+              </span>
+              <span
+                className={cn(
+                  "mt-1 hidden font-mono text-[9px] tracking-[0.22em] text-muted uppercase sm:block",
+                  compact && "text-muted/80",
+                )}
+              >
+                {site.role}
+              </span>
+            </span>
+          </Link>
+
+          <nav className="hidden items-center gap-8 whitespace-nowrap lg:flex" aria-label="Primary">
+            {headerNav.map((link) => {
+              const active = isActivePath(pathname, link.href);
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="py-2 text-muted hover:text-foreground"
-                  onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "group relative py-1 font-mono text-[10px] tracking-[0.22em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                    active ? "text-foreground" : "text-muted hover:text-accent",
+                  )}
                 >
                   {link.label}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute -bottom-1 left-0 h-px w-3 bg-accent transition-opacity duration-300",
+                      active ? "opacity-100" : "opacity-0 group-hover:opacity-50",
+                    )}
+                  />
                 </Link>
-              ))}
-              <Link
-                href={`mailto:${site.email}`}
-                className="py-2 text-accent"
-                onClick={() => setOpen(false)}
-              >
-                Contact
-              </Link>
-            </div>
-          </motion.nav>
-        ) : null}
-      </AnimatePresence>
-    </header>
+              );
+            })}
+            <ContactCta className="ml-1" />
+          </nav>
+
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/10 transition-colors duration-300 hover:border-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:hidden"
+            aria-expanded={open}
+            aria-controls="site-mobile-nav"
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="flex w-3.5 flex-col gap-1" aria-hidden="true">
+              <span
+                className={cn(
+                  "h-px w-full bg-foreground",
+                  reduced ? undefined : "transition duration-300",
+                  open && "translate-y-[5px] rotate-45",
+                )}
+              />
+              <span
+                className={cn(
+                  "h-px w-full bg-foreground",
+                  reduced ? undefined : "transition duration-300",
+                  open && "opacity-0",
+                )}
+              />
+              <span
+                className={cn(
+                  "h-px w-full bg-foreground",
+                  reduced ? undefined : "transition duration-300",
+                  open && "-translate-y-[5px] -rotate-45",
+                )}
+              />
+            </span>
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {open ? (
+            <motion.nav
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduced ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.22, ease: easeOut }}
+              id="site-mobile-nav"
+              className="border-t border-white/[0.08] bg-background lg:hidden"
+              aria-label="Mobile"
+            >
+              <div className="mx-auto flex max-h-[calc(100dvh-3.5rem)] w-full max-w-6xl flex-col overflow-y-auto px-5 py-2 sm:px-8">
+                {headerNav.map((link) => {
+                  const active = isActivePath(pathname, link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "flex min-h-12 items-center justify-between font-mono text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                        active ? "text-foreground" : "text-muted hover:text-accent",
+                      )}
+                      onClick={() => setOpen(false)}
+                    >
+                      {link.label}
+                      {active ? (
+                        <span aria-hidden="true" className="h-px w-3 bg-accent" />
+                      ) : null}
+                    </Link>
+                  );
+                })}
+                <div className="mt-3 mb-4">
+                  <ContactCta onClick={() => setOpen(false)} />
+                </div>
+              </div>
+            </motion.nav>
+          ) : null}
+        </AnimatePresence>
+      </header>
+    </>
   );
 }

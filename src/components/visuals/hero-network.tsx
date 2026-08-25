@@ -1,9 +1,9 @@
 import Image from "next/image";
 
-const CX = 280;
-const CY = 280;
-const HUB_R = 160;
-const NODE_R = 214;
+const CX = 320;
+const CY = 320;
+const HUB_R = 170;
+const NODE_R = 230;
 
 type Node = {
   id: string;
@@ -14,12 +14,12 @@ type Node = {
 };
 
 const NODES: Node[] = [
-  { id: "map", label: "Map", sub: "live ops", deg: 0, anchor: "middle" },
-  { id: "onnx", label: "ONNX", sub: "on-device", deg: 58, anchor: "start" },
-  { id: "eks", label: "EKS", sub: "cloud", deg: 122, anchor: "start" },
-  { id: "cicd", label: "CI/CD", sub: "release", deg: 180, anchor: "middle" },
-  { id: "workers", label: "Workers", sub: "3,500+", deg: 238, anchor: "end" },
-  { id: "machines", label: "Machines", sub: "250+", deg: 302, anchor: "end" },
+  { id: "architecture", label: "ARCHITECTURE", sub: "system design", deg: 0, anchor: "middle" },
+  { id: "engineering", label: "ENGINEERING", sub: "software", deg: 58, anchor: "start" },
+  { id: "deployment", label: "DEPLOYMENT", sub: "production", deg: 122, anchor: "start" },
+  { id: "scale", label: "SCALE", sub: "infrastructure", deg: 180, anchor: "middle" },
+  { id: "optimization", label: "OPTIMIZATION", sub: "performance", deg: 238, anchor: "end" },
+  { id: "automation", label: "AUTOMATION", sub: "CI/CD", deg: 302, anchor: "end" },
 ];
 
 function polar(deg: number, radius: number) {
@@ -31,7 +31,8 @@ function polar(deg: number, radius: number) {
 }
 
 function labelPoint(node: Node) {
-  const extra = node.anchor === "middle" ? (node.deg === 0 ? 32 : 38) : 30;
+  const extra =
+    node.anchor === "middle" ? (node.deg === 0 ? 36 : 42) : node.label.length > 10 ? 42 : 36;
   return polar(node.deg, NODE_R + extra);
 }
 
@@ -52,7 +53,7 @@ export function HeroNetwork() {
     <figure className="relative w-full max-w-lg">
       <div className="relative aspect-square w-full">
         <svg
-          viewBox="0 0 560 560"
+          viewBox="0 0 640 640"
           className="absolute inset-0 h-full w-full overflow-visible"
           aria-hidden="true"
         >
@@ -71,13 +72,13 @@ export function HeroNetwork() {
             </filter>
           </defs>
 
-          <circle cx={CX} cy={CY} r="248" fill="url(#hero-hub-glow)" />
+          <circle cx={CX} cy={CY} r="278" fill="url(#hero-hub-glow)" />
 
           <g className="hero-orbit">
             <circle
               cx={CX}
               cy={CY}
-              r="176"
+              r="200"
               fill="none"
               stroke="#c9a36a"
               strokeOpacity="0.18"
@@ -151,20 +152,21 @@ export function HeroNetwork() {
                   y={label.y}
                   textAnchor={node.anchor}
                   fill="#f3eee4"
-                  fontSize="12"
+                  fontSize="13"
+                  fontWeight="500"
                   fontFamily="var(--font-geist-mono), ui-monospace, monospace"
-                  letterSpacing="0.08em"
+                  letterSpacing="0.09em"
                 >
                   {node.label}
                 </text>
                 <text
                   x={label.x}
-                  y={label.y + 14}
+                  y={label.y + 17}
                   textAnchor={node.anchor}
-                  fill="#9a9388"
-                  fontSize="9"
+                  fill="#b6ada0"
+                  fontSize="11.5"
                   fontFamily="var(--font-geist-mono), ui-monospace, monospace"
-                  letterSpacing="0.12em"
+                  letterSpacing="0.1em"
                 >
                   {node.sub}
                 </text>
@@ -187,7 +189,7 @@ export function HeroNetwork() {
         </div>
       </div>
       <figcaption className="mt-5 text-center font-mono text-[11px] tracking-[0.18em] text-muted uppercase">
-        Field machines · people on the map · models · the cloud they ship through
+        Architecting software · engineering systems · scaling infrastructure
       </figcaption>
     </figure>
   );

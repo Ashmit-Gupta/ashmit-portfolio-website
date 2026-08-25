@@ -1,0 +1,56 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ag-logomark-title">
+  <title id="ag-logomark-title">Ashmit Gupta</title>
+  <style>
+    .ag-orbit {
+      transform-origin: 16px 16px;
+      animation: ag-spin 10s linear infinite;
+    }
+    .ag-dot {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: ag-pulse 3.2s ease-in-out infinite;
+    }
+    @keyframes ag-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes ag-pulse {
+      0%, 100% {
+        opacity: 0.65;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ag-orbit,
+      .ag-dot {
+        animation: none;
+      }
+    }
+  </style>
+  <g class="ag-orbit">
+    <circle
+      cx="16"
+      cy="16"
+      r="11"
+      fill="none"
+      stroke="#c9a36a"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-dasharray="2.2 5.6"
+    />
+    <circle class="ag-dot" cx="16" cy="5" r="1.6" fill="#c9a36a" />
+  </g>
+  <path
+    d="M16 10 L11 23 M16 10 L21 23 M13.31 17 L18.69 17"
+    fill="none"
+    stroke="#c9a36a"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

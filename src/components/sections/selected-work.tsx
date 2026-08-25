@@ -39,7 +39,7 @@ export function ProjectCard({ project }: { project: CaseStudyProject }) {
 
 export function SelectedWork({ projects }: { projects: CaseStudyProject[] }) {
   return (
-    <section className="py-24">
+    <section id="selected-work" className="py-24">
       <Container>
         <SectionHeading
           kicker="Selected work"
