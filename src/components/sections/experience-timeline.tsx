@@ -9,9 +9,9 @@ import { useReducedMotion } from "@/lib/animations/use-reduced-motion";
 import { routes } from "@/lib/constants/routes";
 
 export type TimelineProject = {
-  slug: string;
+  slug?: string;
   title: string;
-  subtitle: string;
+  description: string;
 };
 
 export type TimelineEntry = {
@@ -109,27 +109,47 @@ export function ExperienceTimeline({ entries }: { entries: TimelineEntry[] }) {
             </div>
 
             <StaggerIn className="flex min-w-0 flex-col gap-3">
-              {entry.projects.map((project) => (
-                <div key={project.slug} data-stagger-item className="min-w-0">
-                  <HoverLiftCard className="min-w-0">
-                    <Link
-                      href={routes.project(project.slug)}
-                      className="group flex items-center justify-between gap-4 rounded-xl border border-line bg-surface/80 px-5 py-4 backdrop-blur-md transition-colors hover:border-accent"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-display text-lg">{project.title}</p>
-                        <p className="mt-1 truncate text-sm text-muted">
-                          {project.subtitle}
-                        </p>
-                      </div>
-                      <span className="inline-flex shrink-0 items-center gap-1 text-sm text-muted group-hover:text-foreground">
+              {entry.projects.map((project) => {
+                const inner = (
+                  <div className="flex items-start justify-between gap-4 rounded-xl border border-line bg-surface/80 px-5 py-4 backdrop-blur-md">
+                    <div className="min-w-0">
+                      <p className="font-display text-lg leading-snug">
+                        {project.title}
+                      </p>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                        {project.description}
+                      </p>
+                    </div>
+                    {project.slug ? (
+                      <span className="mt-1 inline-flex shrink-0 items-center gap-1 text-sm text-muted group-hover:text-foreground">
                         View project
                         <span aria-hidden="true">↗</span>
                       </span>
-                    </Link>
-                  </HoverLiftCard>
-                </div>
-              ))}
+                    ) : null}
+                  </div>
+                );
+
+                return (
+                  <div
+                    key={project.slug ?? project.title}
+                    data-stagger-item
+                    className="min-w-0"
+                  >
+                    <HoverLiftCard className="min-w-0">
+                      {project.slug ? (
+                        <Link
+                          href={routes.project(project.slug)}
+                          className="group block transition-colors hover:[&>div]:border-accent"
+                        >
+                          {inner}
+                        </Link>
+                      ) : (
+                        inner
+                      )}
+                    </HoverLiftCard>
+                  </div>
+                );
+              })}
             </StaggerIn>
           </li>
         ))}

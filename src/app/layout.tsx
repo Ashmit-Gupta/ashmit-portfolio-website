@@ -4,7 +4,6 @@ import { Providers } from "./providers";
 import { SiteBackdrop } from "@/components/motion/gsap/site-backdrop";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
-import { TerminalOutro } from "@/components/site/terminal-outro";
 import { site } from "@/lib/constants/site";
 import "./globals.css";
 
@@ -120,7 +119,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <div id="site-crt-shift" className="site-crt-shift relative z-10 flex min-h-full flex-1 flex-col">
               <SiteHeader />
               <main className="flex-1">{children}</main>
-              <TerminalOutro />
               <SiteFooter />
             </div>
           </div>

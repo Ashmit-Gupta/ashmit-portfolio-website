@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On-device face liveness — case study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0a08; --bg-2:#121110; --card:#151412;
+    --border:rgba(255,255,255,0.10); --border-strong:rgba(255,255,255,0.20);
+    --text:#eae6dd; --text-secondary:#a8a49b; --text-muted:#6f6b62;
+    --accent:#d9a55a; --accent-soft:rgba(217,165,90,0.14);
+    --green:#8fbf8a;
+    --serif:'Fraunces', serif; --sans:'Inter', sans-serif; --mono:'JetBrains Mono', monospace;
+  }
+  :root[data-theme="dark"]{ --bg:#0b0a08; }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#faf8f4; --bg-2:#f2efe8; --card:#ffffff;
+      --border:rgba(0,0,0,0.10); --border-strong:rgba(0,0,0,0.20);
+      --text:#1c1a16; --text-secondary:#5b574e; --text-muted:#8a8579;
+      --accent:#b5793a; --accent-soft:rgba(181,121,58,0.12);
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.7; -webkit-font-smoothing:antialiased; }
+  .grid-bg{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:linear-gradient(var(--border) 1px, transparent 1px),linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:48px 48px; opacity:0.3;
+    mask-image:radial-gradient(ellipse 80% 50% at 50% 0%, black 30%, transparent 85%); }
+  .wrap{position:relative; z-index:1; max-width:820px; margin:0 auto; padding:0 24px;}
+  .wide{max-width:1040px;}
+
+  header.hero{padding:96px 0 56px; border-bottom:0.5px solid var(--border);}
+  .eyebrow{font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:18px; display:flex; gap:10px; align-items:center;}
+  .tag{font-family:var(--mono); font-size:11px; padding:3px 9px; border:0.5px solid var(--border-strong); border-radius:100px; color:var(--text-secondary); text-transform:none; letter-spacing:0;}
+  h1.title{font-family:var(--serif); font-weight:500; font-size:44px; line-height:1.15; margin-bottom:16px; max-width:680px;}
+  .subtitle{font-size:17px; color:var(--text-secondary); max-width:600px; margin-bottom:36px;}
+  .meta-row{display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; padding-top:28px; border-top:0.5px solid var(--border);}
+  .meta-item .label{font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;}
+  .meta-item .value{font-size:14px; color:var(--text-secondary); line-height:1.5;}
+
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); border-bottom:0.5px solid var(--border);}
+  .stat{padding:32px 20px; border-right:0.5px solid var(--border); opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease;}
+  .stat:last-child{border-right:none;}
+  .stat.visible{opacity:1; transform:translateY(0);}
+  .stat .num{font-family:var(--serif); font-size:34px; color:var(--accent); margin-bottom:6px;}
+  .stat .lbl{font-size:12.5px; color:var(--text-muted);}
+
+  section.beat{padding:64px 0; border-bottom:0.5px solid var(--border);}
+  .beat-label{font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:14px;
+    opacity:0; transform:translateX(-8px); transition:opacity .5s ease, transform .5s ease;}
+  h2.beat-title{font-family:var(--serif); font-weight:500; font-size:27px; margin-bottom:18px;
+    opacity:0; transform:translateY(16px); transition:opacity .6s ease .05s, transform .6s ease .05s;}
+  .beat-body{font-size:16px; color:var(--text-secondary); max-width:640px;
+    opacity:0; transform:translateY(16px); transition:opacity .6s ease .15s, transform .6s ease .15s;}
+  .beat-body + .beat-body{margin-top:14px;}
+  .beat.visible .beat-label, .beat.visible h2.beat-title, .beat.visible .beat-body{opacity:1; transform:none;}
+
+  /* option comparison cards */
+  .option-row{display:flex; gap:16px; margin-top:32px; flex-wrap:wrap;}
+  .option-card{flex:1; min-width:210px; background:var(--card); border:0.5px solid var(--border); border-radius:12px; padding:18px;
+    opacity:0; transform:translateY(18px); transition:opacity .5s cubic-bezier(.2,.7,.3,1), transform .5s cubic-bezier(.2,.7,.3,1);}
+  .option-card.visible{opacity:1; transform:none;}
+  .option-card.chosen{border:2px solid var(--accent); background:var(--accent-soft);}
+  .option-tag{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px;}
+  .option-card.chosen .option-tag{color:var(--accent);}
+  .option-title{font-size:14.5px; font-weight:500; margin-bottom:8px;}
+  .option-reason{font-size:13px; color:var(--text-secondary); line-height:1.55;}
+
+  /* generic node/connector diagram (capture pipeline) */
+  .diagram-section{padding:64px 0; border-bottom:0.5px solid var(--border);}
+  .diagram-wrap{display:flex; align-items:center; gap:0; flex-wrap:wrap; margin-top:32px;}
+  .node{background:var(--card); border:0.5px solid var(--border); border-radius:10px; padding:16px 18px; min-width:150px;
+    opacity:0; transform:translateY(20px) scale(.96); transition:opacity .5s cubic-bezier(.2,.7,.3,1), transform .5s cubic-bezier(.2,.7,.3,1);}
+  .node.visible{opacity:1; transform:none; border-color:var(--border-strong);}
+  .node .node-title{font-size:13.5px; font-weight:500; margin-bottom:4px;}
+  .node .node-sub{font-size:11.5px; color:var(--text-muted); font-family:var(--mono);}
+  .connector{flex:0 0 40px; height:2px; background:var(--border); position:relative; transform:scaleX(0); transform-origin:left; transition:transform .45s ease .1s, background .45s ease .1s;}
+  .connector.visible{transform:scaleX(1); background:var(--accent);}
+  .connector::after{content:''; position:absolute; right:-1px; top:-4px; width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent; border-left:6px solid var(--border); transition:border-left-color .45s ease .1s;}
+  .connector.visible::after{border-left-color:var(--accent);}
+  @media (max-width:680px){
+    .diagram-wrap{flex-direction:column; align-items:stretch;}
+    .connector{width:2px; height:28px; flex:0 0 28px; transform:scaleY(0); transform-origin:top;}
+    .connector.visible{transform:scaleY(1);}
+  }
+
+  /* state machine strip */
+  .state-cell.final{background:var(--accent-soft); position:relative;}
+  .state-cell.final .sc-title{color:var(--accent);}
+  .state-cell.final::after{content:''; position:absolute; inset:0; border-radius:0; box-shadow:0 0 0 0 var(--accent-soft); opacity:0;}
+  .state-cell.final.visible::after{animation:cell-pulse 2.4s ease-out infinite;}
+  @keyframes cell-pulse{
+    0%{ box-shadow:0 0 0 0 rgba(217,165,90,0.35); opacity:1; }
+    100%{ box-shadow:0 0 0 14px rgba(217,165,90,0); opacity:0; }
+  }
+
+  /* layered verification */
+  .layers{margin-top:32px; display:flex; flex-direction:column; gap:10px;}
+  .layer{background:var(--card); border:0.5px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; padding:16px 20px;
+    opacity:0; transform:translateX(-18px); transition:opacity .5s ease, transform .5s ease;}
+  .layer.visible{opacity:1; transform:none;}
+  .layer .layer-title{font-size:14px; font-weight:500; margin-bottom:3px; display:flex; align-items:center; gap:8px;}
+  .layer .layer-loc{font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:100px; border:0.5px solid var(--border-strong); color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+  .layer .layer-sub{font-size:12.5px; color:var(--text-muted);}
+
+  /* rejection checklist */
+  .checklist{margin-top:28px; display:flex; flex-direction:column; gap:2px;}
+  .check-item{display:flex; align-items:flex-start; gap:12px; padding:11px 0; border-bottom:0.5px solid var(--border);
+    opacity:0; transform:translateX(-10px); transition:opacity .4s ease, transform .4s ease;}
+  .check-item:last-child{border-bottom:none;}
+  .check-item.visible{opacity:1; transform:none;}
+  .check-icon{flex:0 0 20px; margin-top:1px;}
+  .check-icon circle{fill:none; stroke:var(--border-strong); stroke-width:1.5;}
+  .check-icon .check-path{stroke:var(--accent); stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:16; stroke-dashoffset:16; transition:stroke-dashoffset .4s ease .18s;}
+  .check-item.visible .check-icon .check-path{stroke-dashoffset:0;}
+  .check-label{font-size:14px; color:var(--text-secondary); padding-top:1px;}
+  .check-item.lead .check-icon circle{fill:var(--accent-soft); stroke:var(--accent);}
+  .check-item.lead .check-label{color:var(--text);}
+  .check-item.lead .check-label b{color:var(--accent);}
+
+  .state-strip{display:flex; gap:0; margin-top:32px; flex-wrap:wrap; border:0.5px solid var(--border); border-radius:12px; overflow:hidden;}
+  .state-cell{flex:1; min-width:130px; padding:16px; border-right:0.5px solid var(--border); text-align:center;
+    opacity:0.3; transition:opacity .4s ease, background .4s ease;}
+  .state-cell:last-child{border-right:none;}
+  .state-cell.visible{opacity:1;}
+  .state-cell .sc-title{font-size:13px; font-weight:500;}
+  .state-cell .sc-sub{font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--mono);}
+
+  /* ===== PINNED FACE-SCAN STORY ===== */
+  .pinned-section{padding:16px 0 40px;}
+  .pinned-grid{display:grid; grid-template-columns:0.85fr 1.15fr; gap:56px; margin-top:28px;}
+  .pinned-visual{position:sticky; top:64px; align-self:start; height:fit-content;
+    background:var(--card); border:0.5px solid var(--border); border-radius:14px; padding:24px; display:flex; flex-direction:column; align-items:center;}
+  .scan-frame{position:relative; width:180px; height:280px; border-radius:18px; background:var(--bg-2); border:0.5px solid var(--border); overflow:hidden;}
+  .scan-frame svg{position:absolute; inset:0; width:100%; height:100%;}
+  .capture-flash{position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none;}
+  .capture-flash.flashing{animation:flash-pop 0.5s ease-out;}
+  @keyframes flash-pop{ 0%{opacity:0;} 20%{opacity:0.7;} 100%{opacity:0;} }
+  .scan-el{opacity:0; transition:opacity .4s ease;}
+  .scan-el.active{opacity:1;}
+  .scan-dot{transition:opacity .3s ease;}
+  .scan-ring{transform-origin:center; opacity:0;}
+  .scan-ring.active{opacity:0.6; animation:scan-pulse 1.8s ease-out infinite;}
+  @keyframes scan-pulse{ 0%{ transform:scale(0.9); opacity:0.6; } 100%{ transform:scale(1.25); opacity:0; } }
+  .second-face{opacity:1; transition:opacity .5s ease;}
+  .scan-frame.no-second .second-face{opacity:0;}
+  .scan-metrics{display:flex; gap:24px; margin-top:20px;}
+  .scan-metric{text-align:center;}
+  .scan-metric .sm-num{font-family:var(--serif); font-size:24px; color:var(--accent);}
+  .scan-metric .sm-lbl{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px;}
+  .confidence-bar{width:100%; height:5px; border-radius:3px; background:var(--border); margin-top:16px; overflow:hidden;}
+  .confidence-fill{height:100%; width:0%; background:var(--accent); border-radius:3px; transition:width .6s ease;}
+
+  .pinned-steps{display:flex; flex-direction:column;}
+  .pstep{min-height:52vh; display:flex; flex-direction:column; justify-content:center; padding:16px 0; opacity:0.3; transition:opacity .4s ease;}
+  .pstep.active{opacity:1;}
+  .pstep .pstep-num{font-size:12px; color:var(--accent); font-family:var(--mono); margin-bottom:10px;}
+  .pstep h3{font-family:var(--serif); font-weight:500; font-size:22px; margin-bottom:10px;}
+  .pstep p{font-size:14.5px; color:var(--text-secondary); max-width:420px;}
+  @media (max-width:760px){
+    .pinned-grid{grid-template-columns:1fr;}
+    .pinned-visual{position:relative; top:0; margin-bottom:24px;}
+    .pstep{min-height:auto; padding:28px 0; opacity:1;}
+  }
+
+  /* ===== FRAME TIMELINE (before/after isolate offload) ===== */
+  .frame-timeline{margin-top:32px; display:flex; flex-direction:column; gap:22px;}
+  .ft-row .ft-label{font-size:12.5px; color:var(--text-muted); margin-bottom:8px; display:flex; justify-content:space-between;}
+  .ft-row .ft-label b{color:var(--text-secondary); font-weight:500;}
+  .ft-bars{display:flex; align-items:flex-end; gap:3px; height:44px; padding:6px; background:var(--card); border:0.5px solid var(--border); border-radius:8px;}
+  .fbar{flex:1; height:4px; border-radius:2px; background:var(--border-strong); transition:height .35s ease, background .35s ease;}
+  .fbar.visible{height:var(--h);}
+  .fbar.drop.visible{background:var(--border-strong); height:6px;}
+  .fbar.on.visible{background:var(--accent);}
+  .fbar.smooth.visible{background:var(--green);}
+
+  .reflection{padding:80px 0 120px;}
+  .reflection blockquote{font-family:var(--serif); font-style:italic; font-size:23px; line-height:1.55; color:var(--text);
+    border-left:2px solid var(--accent); padding-left:24px; max-width:620px;
+    opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease;}
+  .reflection blockquote.visible{opacity:1; transform:none;}
+  .reflection p.next{margin-top:24px; font-size:15px; color:var(--text-secondary); max-width:600px;
+    opacity:0; transform:translateY(12px); transition:opacity .7s ease .1s, transform .7s ease .1s;}
+  .reflection p.next.visible{opacity:1; transform:none;}
+  footer{padding:36px 0 60px; border-top:0.5px solid var(--border); font-size:13px; color:var(--text-muted);}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Case study <span class="tag">AI / ML</span><span class="tag">Mobile</span></p>
+    <h1 class="title">A conversion and inference problem, not a camera widget</h1>
+    <p class="subtitle">TensorFlow model to ONNX, on-device runtime, liveness signals, and isolate offload so the UI thread never runs the graph.</p>
+    <div class="meta-row">
+      <div class="meta-item"><div class="label">Role</div><div class="value">Mobile / ML engineer, pipeline owner</div></div>
+      <div class="meta-item"><div class="label">Stack</div><div class="value">Flutter, Google ML Kit, ONNX Runtime, TensorFlow, Dart isolates, Kotlin, Swift</div></div>
+      <div class="meta-item"><div class="label">Surface</div><div class="value">Identity capture for an internal enterprise app</div></div>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="num">2s</div><div class="lbl">capture latency</div></div>
+    <div class="stat"><div class="num">6s</div><div class="lbl">latency before</div></div>
+    <div class="stat"><div class="num">−90%</div><div class="lbl">invalid captures</div></div>
+  </div>
+
+  <section class="beat">
+    <p class="beat-label">Context</p>
+    <h2 class="beat-title">Face capture is the gate for identity</h2>
+    <p class="beat-body">The app is a unified enterprise client covering attendance, tasks, approvals, and internal workflows. Face capture has to work in warehouses and yards, under uneven lighting, on mid-range phones, and it cannot accept a printed photo.</p>
+    <p class="beat-body">I owned the capture pipeline end to end, detection, liveness, spoof resistance, and the UX that actually gets a usable set of images without a trained operator behind the camera.</p>
+  </section>
+
+  <section class="beat">
+    <p class="beat-label">Problem</p>
+    <h2 class="beat-title">Slow, noisy, and blocking the thread that needed to stay free</h2>
+    <p class="beat-body">The first version was slow and noisy. Face detection sat around six seconds. Invalid and spoofed captures were common enough to poison downstream records. Heavy inference on the UI isolate dropped frames during the exact preview the user was trying to hold still for.</p>
+    <p class="beat-body">A cloud round-trip was the wrong default. Connectivity is unreliable, latency is visible, and identity photos should not need to leave the device to decide "this is a live face."</p>
+  </section>
+
+  <section class="beat">
+    <p class="beat-label">Investigation</p>
+    <h2 class="beat-title">The detector was fine. The spoof model was the bottleneck</h2>
+    <p class="beat-body">Google ML Kit was already the right detector for faces and document edges. The spoof model was heavier than the phones being shipped to, and running it inline with camera frames made the preview stutter.</p>
+    <p class="beat-body">What was needed: a smaller runtime, a clear split between "is there a face" and "is it live," and a capture state machine that does not depend on a shutter tap from someone wearing gloves.</p>
+  </section>
+
+  <section class="beat" style="border-bottom:none; padding-bottom:0;">
+    <p class="beat-label">Options considered</p>
+    <h2 class="beat-title" style="margin-bottom:0;">Four paths, one that kept the model's behavior</h2>
+  </section>
+</div>
+
+<div class="wrap wide">
+  <div class="option-row" id="optionRow">
+    <div class="option-card">
+      <div class="option-tag">Rejected</div>
+      <div class="option-title">Keep TensorFlow on device</div>
+      <div class="option-reason">Same graph, same phones. Latency stays at six seconds and the preview keeps stuttering.</div>
+    </div>
+    <div class="option-card">
+      <div class="option-tag">Rejected</div>
+      <div class="option-title">Move spoof checks to a server</div>
+      <div class="option-reason">Fails offline, adds visible round-trip latency, and leaks more identity imagery than necessary.</div>
+    </div>
+    <div class="option-card">
+      <div class="option-tag">Rejected</div>
+      <div class="option-title">Swap in a vendor liveness SDK</div>
+      <div class="option-reason">Faster to integrate, but it hides the failure modes behind someone else's black box.</div>
+    </div>
+    <div class="option-card chosen">
+      <div class="option-tag">Chosen</div>
+      <div class="option-title">Convert to ONNX, own the runtime</div>
+      <div class="option-reason">Keeps the model already trusted, runs it on a runtime built for mobile, and liveness logic stays in our control.</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="beat">
+    <p class="beat-label">Engineering decision</p>
+    <h2 class="beat-title">Convert the graph, keep the model, split the work</h2>
+    <p class="beat-body">TensorFlow converted to ONNX, running through ONNX Runtime on device. ML Kit stays for detection. Liveness (blink, depth-from-video) runs before anything commits. Auto-capture locks a face, waits for liveness, and takes multiple profile stills without a manual shutter.</p>
+    <p class="beat-body">Pre-process, post-process, and inference all moved onto Dart isolates, so the preview stays a UI problem, not a graph problem. The pipeline got its own architecture and requirements doc, so the next person isn't reverse-engineering a model file.</p>
+  </section>
+</div>
+
+<!-- ================= PINNED FACE-SCAN STORY ================= -->
+<div class="wrap wide">
+  <section class="pinned-section">
+    <p class="beat-label" style="opacity:1; transform:none;">Walkthrough</p>
+    <h2 class="beat-title" style="opacity:1; transform:none; margin-bottom:0;">Scroll through what the camera sees</h2>
+
+    <div class="pinned-grid">
+      <div class="pinned-visual">
+        <div class="scan-frame" id="scanFrame">
+          <svg viewBox="0 0 180 280" xmlns="http://www.w3.org/2000/svg">
+            <!-- second person, partially in frame — removed once liveness (stage 2) begins -->
+            <g class="second-face">
+              <ellipse cx="158" cy="58" rx="26" ry="32" fill="none" stroke="var(--border)" stroke-width="1.3"/>
+              <circle cx="149" cy="52" r="2.2" fill="var(--text-muted)" opacity="0.6"/>
+              <circle cx="165" cy="52" r="2.2" fill="var(--text-muted)" opacity="0.6"/>
+            </g>
+
+            <ellipse cx="90" cy="120" rx="46" ry="58" fill="none" stroke="var(--border-strong)" stroke-width="1.5"/>
+            <circle cx="72" cy="108" r="4" fill="var(--text-muted)"/>
+            <circle cx="108" cy="108" r="4" fill="var(--text-muted)"/>
+            <path d="M84 138 Q90 143 96 138" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+
+            <rect class="scan-el" data-stage="0" x="34" y="52" width="112" height="136" rx="10" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+            <!-- second face flagged and excluded once detect runs, gone by the time liveness starts -->
+            <g class="scan-el reject-mark second-face" data-stage="0">
+              <rect x="130" y="28" width="56" height="60" rx="8" fill="none" stroke="var(--text-muted)" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.7"/>
+              <line x1="140" y1="38" x2="176" y2="78" stroke="var(--text-muted)" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="176" y1="38" x2="140" y2="78" stroke="var(--text-muted)" stroke-width="1.8" stroke-linecap="round"/>
+            </g>
+
+            <g class="scan-el" data-stage="1">
+              <circle class="scan-dot" cx="72" cy="108" r="2.5" fill="var(--accent)"/>
+              <circle class="scan-dot" cx="108" cy="108" r="2.5" fill="var(--accent)"/>
+              <circle class="scan-dot" cx="90" cy="122" r="2.5" fill="var(--accent)"/>
+              <circle class="scan-dot" cx="84" cy="138" r="2.5" fill="var(--accent)"/>
+              <circle class="scan-dot" cx="96" cy="138" r="2.5" fill="var(--accent)"/>
+              <circle class="scan-dot" cx="65" cy="90" r="2.5" fill="var(--accent)"/>
+              <circle class="scan-dot" cx="115" cy="90" r="2.5" fill="var(--accent)"/>
+            </g>
+
+            <circle class="scan-el scan-ring" data-stage="2" cx="90" cy="120" r="60" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+
+            <g class="scan-el" data-stage="3">
+              <path d="M66 118 L82 134 L116 96" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </svg>
+          <div class="capture-flash" id="captureFlash"></div>
+        </div>
+        <div class="scan-metrics">
+          <div class="scan-metric"><div class="sm-num" id="elapsedVal">0.0s</div><div class="sm-lbl">elapsed</div></div>
+          <div class="scan-metric"><div class="sm-num" id="confVal">0%</div><div class="sm-lbl">confidence</div></div>
+        </div>
+        <div class="confidence-bar"><div class="confidence-fill" id="confFill"></div></div>
+      </div>
+
+      <div class="pinned-steps">
+        <div class="pstep" data-stage="0">
+          <p class="pstep-num">01 / DETECT</p>
+          <h3>Exactly one face, or none of this runs</h3>
+          <p>ML Kit proposes a bounding box on the primary face and checks pose, distance, and occlusion. A second face in frame gets flagged and excluded, group shots don't get past this step.</p>
+        </div>
+        <div class="pstep" data-stage="1">
+          <p class="pstep-num">02 / LANDMARK</p>
+          <h3>Euler angles and a missing nose</h3>
+          <p>Head angle via Euler X/Y/Z, distance from the bounding-box-to-frame ratio, and occlusion caught by a missing nose landmark.</p>
+        </div>
+        <div class="pstep" data-stage="2">
+          <p class="pstep-num">03 / LIVENESS</p>
+          <h3>Prove it's not a photo</h3>
+          <p>The ONNX spoof head vetoes prints and screens. A two-blink challenge raises the cost of a replayed video specifically.</p>
+        </div>
+        <div class="pstep" data-stage="3">
+          <p class="pstep-num">04 / CAPTURE</p>
+          <h3>Committed, no shutter tap</h3>
+          <p>Multiple profile stills captured automatically once every check clears. The person never touches a button.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+
+  <section class="beat">
+    <p class="beat-label">Implementation</p>
+    <h2 class="beat-title">A session is a state machine, not a shutter button</h2>
+    <p class="beat-body">ML Kit proposes the box, the ONNX spoof head vetoes prints and screens, and blink plus depth checks raise the cost of a still-image attack. The UI isolate only renders preview and session state, nothing heavier. Model load and preprocessing were tuned for the hardware actually in the field, not a flagship benchmark device. Failure paths, timeout, failed liveness, low light, retry in-session instead of dumping the user back to a form.</p>
+
+    <div class="frame-timeline">
+      <div class="ft-row">
+        <div class="ft-label"><b>Before</b> · inference runs on the UI isolate<span>frame drops</span></div>
+        <div class="ft-bars" id="ftBefore">
+          <div class="fbar on" style="--h:62%"></div><div class="fbar on" style="--h:58%"></div><div class="fbar drop" style="--h:6%"></div>
+          <div class="fbar on" style="--h:66%"></div><div class="fbar on" style="--h:60%"></div><div class="fbar drop" style="--h:6%"></div>
+          <div class="fbar on" style="--h:64%"></div><div class="fbar drop" style="--h:6%"></div><div class="fbar on" style="--h:59%"></div>
+          <div class="fbar on" style="--h:63%"></div><div class="fbar drop" style="--h:6%"></div><div class="fbar on" style="--h:57%"></div>
+          <div class="fbar on" style="--h:65%"></div><div class="fbar drop" style="--h:6%"></div><div class="fbar on" style="--h:61%"></div>
+          <div class="fbar on" style="--h:60%"></div><div class="fbar drop" style="--h:6%"></div><div class="fbar on" style="--h:64%"></div>
+          <div class="fbar on" style="--h:58%"></div><div class="fbar on" style="--h:62%"></div>
+        </div>
+      </div>
+      <div class="ft-row">
+        <div class="ft-label"><b>After</b> · inference runs on a Dart isolate<span>no drops</span></div>
+        <div class="ft-bars" id="ftAfter">
+          <div class="fbar smooth" style="--h:64%"></div><div class="fbar smooth" style="--h:66%"></div><div class="fbar smooth" style="--h:62%"></div>
+          <div class="fbar smooth" style="--h:65%"></div><div class="fbar smooth" style="--h:63%"></div><div class="fbar smooth" style="--h:67%"></div>
+          <div class="fbar smooth" style="--h:64%"></div><div class="fbar smooth" style="--h:65%"></div><div class="fbar smooth" style="--h:62%"></div>
+          <div class="fbar smooth" style="--h:66%"></div><div class="fbar smooth" style="--h:64%"></div><div class="fbar smooth" style="--h:63%"></div>
+          <div class="fbar smooth" style="--h:65%"></div><div class="fbar smooth" style="--h:67%"></div><div class="fbar smooth" style="--h:64%"></div>
+          <div class="fbar smooth" style="--h:62%"></div><div class="fbar smooth" style="--h:65%"></div><div class="fbar smooth" style="--h:66%"></div>
+          <div class="fbar smooth" style="--h:63%"></div><div class="fbar smooth" style="--h:64%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-strip" id="stateStrip">
+      <div class="state-cell"><div class="sc-title">No face</div><div class="sc-sub">idle</div></div>
+      <div class="state-cell"><div class="sc-title">Face present</div><div class="sc-sub">ML Kit</div></div>
+      <div class="state-cell"><div class="sc-title">Liveness pending</div><div class="sc-sub">blink + depth</div></div>
+      <div class="state-cell"><div class="sc-title">Capturing</div><div class="sc-sub">multi-still</div></div>
+      <div class="state-cell final"><div class="sc-title">Complete</div><div class="sc-sub">committed</div></div>
+    </div>
+
+    <p class="beat-body" style="margin-top:32px; opacity:1; transform:none;">Registration captures three poses, left, front, and right, to build a fuller reference. Attendance only ever needs one, front, since it's verifying against a reference that already exists.</p>
+  </section>
+
+  <section class="beat">
+    <p class="beat-label">Defense in depth</p>
+    <h2 class="beat-title">Three layers, not one model doing everything</h2>
+    <p class="beat-body">No single check carries the whole decision. Each layer either gates capture quality, vetoes an obvious spoof, or re-checks identity where accuracy matters more than speed.</p>
+    <div class="layers" id="layerStack">
+      <div class="layer">
+        <div class="layer-title">ML Kit face detection<span class="layer-loc">on-device</span></div>
+        <div class="layer-sub">Capture quality gate: pose, distance, occlusion, single face</div>
+      </div>
+      <div class="layer">
+        <div class="layer-title">ONNX anti-spoof classifier<span class="layer-loc">on-device</span></div>
+        <div class="layer-sub">Custom model, converted from TensorFlow, vetoes prints and screens before commit</div>
+      </div>
+      <div class="layer">
+        <div class="layer-title">TensorFlow re-validation<span class="layer-loc">backend</span></div>
+        <div class="layer-sub">Secondary pass where accuracy matters more than latency, actual identity matching</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="beat">
+    <p class="beat-label">What gets rejected</p>
+    <h2 class="beat-title">The −90%, itemized</h2>
+    <p class="beat-body">Passive checks catch a static photo. The active challenge is what defeats a replayed video, which is why it leads.</p>
+    <div class="checklist" id="rejectList">
+      <div class="check-item lead">
+        <svg class="check-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/><path class="check-path" d="M6 10l3 3l5-6"/></svg>
+        <div class="check-label"><b>Two-blink liveness challenge not completed</b> — the active check, defeats replayed video</div>
+      </div>
+      <div class="check-item">
+        <svg class="check-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/><path class="check-path" d="M6 10l3 3l5-6"/></svg>
+        <div class="check-label">Photo or video spoof detected</div>
+      </div>
+      <div class="check-item">
+        <svg class="check-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/><path class="check-path" d="M6 10l3 3l5-6"/></svg>
+        <div class="check-label">Two or more people in frame</div>
+      </div>
+      <div class="check-item">
+        <svg class="check-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/><path class="check-path" d="M6 10l3 3l5-6"/></svg>
+        <div class="check-label">Face not visible, or outside the bounding box</div>
+      </div>
+      <div class="check-item">
+        <svg class="check-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/><path class="check-path" d="M6 10l3 3l5-6"/></svg>
+        <div class="check-label">Eyes closed at capture</div>
+      </div>
+      <div class="check-item">
+        <svg class="check-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/><path class="check-path" d="M6 10l3 3l5-6"/></svg>
+        <div class="check-label">Insufficient lighting, or face otherwise unclear</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= CAPTURE PIPELINE DIAGRAM ================= -->
+<div class="wrap wide">
+  <section class="diagram-section">
+    <p class="beat-label" style="opacity:1; transform:none;">Capture pipeline</p>
+    <h2 class="beat-title" style="opacity:1; transform:none; margin-bottom:0;">Frames in, a verified still out</h2>
+
+    <div class="diagram-wrap" id="captureDiagram">
+      <div class="node" data-step="0"><div class="node-title">Camera preview</div><div class="node-sub">frames</div></div>
+      <div class="connector" data-step="1"></div>
+      <div class="node" data-step="2"><div class="node-title">ML Kit detect</div><div class="node-sub">isolate</div></div>
+      <div class="connector" data-step="3"></div>
+      <div class="node" data-step="4"><div class="node-title">ONNX spoof + liveness</div><div class="node-sub">commit</div></div>
+      <div class="connector" data-step="5"></div>
+      <div class="node" data-step="6" style="border-color:var(--accent); background:var(--accent-soft);"><div class="node-title">Auto-capture</div><div class="node-sub">no shutter tap</div></div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="beat">
+    <p class="beat-label">Result</p>
+    <h2 class="beat-title">The camera stopped being the obstacle</h2>
+    <p class="beat-body">Detection-to-capture dropped from around six seconds to around two. Invalid and unusable captures fell roughly 90%. Preview stayed usable through the whole session because the heavy work left the UI thread entirely.</p>
+    <p class="beat-body">Attendance and onboarding stopped being a fight with the camera. The same pipeline is the reason on-device ML gets treated here as a product surface, not a demo notebook.</p>
+  </section>
+
+  <section class="reflection">
+    <p class="beat-label">Reflection</p>
+    <blockquote>The conversion mattered more than a new architecture diagram. What was needed wasn't a larger model, it was the model already trusted, on a runtime the phone could finish in time, with liveness that matches the attack actually seen, photos, and UX that doesn't ask a field worker to be a photographer.</blockquote>
+    <p class="next">Next time: a recorded golden set of spoof and live clips in CI. Latency numbers drift unless the device and the clip are both pinned.</p>
+  </section>
+
+  <footer>Face liveness pipeline · case study</footer>
+</div>
+
+<script>
+(function(){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); } });
+  }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.stat, .beat').forEach(function(el){ io.observe(el); });
+
+  function staggerDiagram(containerId, stepDelay){
+    var container = document.getElementById(containerId);
+    if(!container) return;
+    var items = Array.prototype.slice.call(container.children);
+    var sio = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          items.forEach(function(item, i){ setTimeout(function(){ item.classList.add('visible'); }, i * stepDelay); });
+          sio.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    sio.observe(container);
+  }
+  staggerDiagram('optionRow', 150);
+  staggerDiagram('captureDiagram', 200);
+  staggerDiagram('stateStrip', 180);
+  staggerDiagram('layerStack', 160);
+  staggerDiagram('rejectList', 90);
+  staggerDiagram('ftBefore', 25);
+  staggerDiagram('ftAfter', 25);
+
+  /* pinned face-scan: steps drive overlay state + elapsed/confidence counters */
+  var scanStages = [
+    { elapsed: 0.0, conf: 0 },
+    { elapsed: 0.6, conf: 35 },
+    { elapsed: 1.3, conf: 75 },
+    { elapsed: 2.0, conf: 100 }
+  ];
+  var elapsedEl = document.getElementById('elapsedVal');
+  var confEl = document.getElementById('confVal');
+  var confFill = document.getElementById('confFill');
+  var flashEl = document.getElementById('captureFlash');
+  var scanFrameEl = document.getElementById('scanFrame');
+  var scanCurrent = -1;
+
+  function tweenDecimal(el, from, to, duration, suffix){
+    var start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start) / duration, 1);
+      var val = from + (to - from) * p;
+      el.textContent = val.toFixed(1) + suffix;
+      if(p < 1){ requestAnimationFrame(step); }
+    }
+    requestAnimationFrame(step);
+  }
+  function tweenInt(el, from, to, duration, suffix){
+    var start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start) / duration, 1);
+      var val = Math.round(from + (to - from) * p);
+      el.textContent = val + suffix;
+      if(p < 1){ requestAnimationFrame(step); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function setScanStage(idx){
+    if(idx === scanCurrent) return;
+    var prev = scanCurrent >= 0 ? scanStages[scanCurrent] : { elapsed: 0, conf: 0 };
+    scanCurrent = idx;
+    var target = scanStages[idx];
+    if(elapsedEl) tweenDecimal(elapsedEl, prev.elapsed, target.elapsed, 500, 's');
+    if(confEl) tweenInt(confEl, prev.conf, target.conf, 500, '%');
+    if(confFill) confFill.style.width = target.conf + '%';
+
+    document.querySelectorAll('.scan-el').forEach(function(el){
+      var s = parseInt(el.getAttribute('data-stage'), 10);
+      el.classList.toggle('active', s === idx || (s < idx && s !== 2));
+    });
+    if(scanFrameEl){ scanFrameEl.classList.toggle('no-second', idx >= 2); }
+    if(idx === 3 && flashEl){
+      flashEl.classList.remove('flashing');
+      void flashEl.offsetWidth;
+      flashEl.classList.add('flashing');
+    }
+  }
+
+  var scanSteps = document.querySelectorAll('.pinned-grid .pstep');
+  if(scanSteps.length){
+    var sio2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var stage = parseInt(entry.target.getAttribute('data-stage'), 10);
+        if(entry.isIntersecting){
+          entry.target.classList.add('active');
+          setScanStage(stage);
+        } else {
+          entry.target.classList.remove('active');
+        }
+      });
+    }, { threshold: 0.5, rootMargin: '-20% 0px -20% 0px' });
+    scanSteps.forEach(function(s){ sio2.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,11 +1,16 @@
+export interface ExperienceProjectCard {
+  slug?: string;
+  title: string;
+  description: string;
+}
+
 export interface ExperienceEntry {
   id: string;
   company: string;
   role: string;
   period: string;
   summary: string;
-  /** Slugs into content/projects, in display order. */
-  projectSlugs: string[];
+  projects: ExperienceProjectCard[];
 }
 
 export const experience: ExperienceEntry[] = [
@@ -15,8 +20,32 @@ export const experience: ExperienceEntry[] = [
     role: "Software Engineer",
     period: "July 2025 – Present",
     summary:
-      "Designing and shipping Aurora, an industrial IoT platform, the on-device face-liveness capture pipeline, and the AWS platform that runs the company's internal services.",
-    projectSlugs: ["aurora", "face-liveness-pipeline", "ienergy-devsecops-platform"],
+      "Designing and shipping real-time IoT monitoring systems for industrial machines and field teams, an on-device face-liveness verification pipeline for workforce attendance, and the adaptive Flutter architecture and cloud infrastructure that run the company's internal services and products.",
+    projects: [
+      {
+        slug: "aurora",
+        title: "Real-Time IoT Monitoring Platform",
+        description:
+          "Live telemetry, GPS, and BLE sensor tracking for industrial machines and field workers, rendered on a real-time map with 3,500+ live markers across 250+ connected machines.",
+      },
+      {
+        slug: "face-liveness-pipeline",
+        title: "On-Device Face Liveness & Anti-Spoof Verification",
+        description:
+          "Face-capture pipeline for workforce attendance combining on-device ML detection, a custom anti-spoof classifier, and an active liveness challenge to defeat photo and video spoofing.",
+      },
+      {
+        slug: "ienergy-devsecops-platform",
+        title: "Cloud Infrastructure & DevSecOps Platform",
+        description:
+          "Terraform-provisioned AWS infrastructure running a Kubernetes cluster for internal services, with a Jenkins pipeline gated by Trivy scanning and a self-hosted SonarQube server posting per-push severity reports to Teams.",
+      },
+      {
+        title: "Adaptive Multi-Platform Architecture",
+        description:
+          "Authored the internal standard for a single codebase adapting across phone, tablet, foldable, and desktop, with strict separation between logic, layout, and rendering so new form factors are additive, not rewrites.",
+      },
+    ],
   },
   {
     id: "whatbytes",
@@ -25,7 +54,13 @@ export const experience: ExperienceEntry[] = [
     period: "Feb 2025 – June 2025",
     summary:
       "Refactored a Flutter codebase to Clean Architecture, lifting frame rate ~35% and unit test coverage ~40%.",
-    projectSlugs: ["whatbytes-refactor"],
+    projects: [
+      {
+        slug: "whatbytes-refactor",
+        title: "WhatBytes Flutter refactor",
+        description: "From a monolith to Clean Architecture you can test",
+      },
+    ],
   },
   {
     id: "adm",
@@ -34,6 +69,12 @@ export const experience: ExperienceEntry[] = [
     period: "Sep 2024 – Feb 2025",
     summary:
       "Built two native Android apps for real-time NGO ambulance dispatch, with live tracking over Server-Sent Events.",
-    projectSlugs: ["adm-ambulance-apps"],
+    projects: [
+      {
+        slug: "adm-ambulance-apps",
+        title: "Ambulance dispatch apps",
+        description: "Two native Android clients for live NGO dispatch",
+      },
+    ],
   },
 ];

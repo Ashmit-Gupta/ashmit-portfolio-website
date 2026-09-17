@@ -5,6 +5,7 @@ import { HeroSection } from "@/components/sections/hero";
 import { MethodologySection } from "@/components/sections/methodology";
 import { MetricsBand } from "@/components/sections/metrics-band";
 import { SelectedWork } from "@/components/sections/selected-work";
+import { TerminalOutro } from "@/components/site/terminal-outro";
 import { featuredProjects } from "@/content/projects";
 import { site } from "@/lib/constants/site";
 
@@ -25,6 +26,7 @@ export default function Home() {
       <SelectedWork projects={featuredProjects} />
       <MethodologySection />
       <ContactSection />
+      <TerminalOutro />
     </>
   );
 }
