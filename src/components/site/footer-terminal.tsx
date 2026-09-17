@@ -704,7 +704,21 @@ export function FooterTerminal() {
                 >
                   <div className="footer-crash-in flex max-h-[min(90dvh,560px)] w-full max-w-lg flex-col overflow-hidden rounded-[10px] border border-[rgba(226,87,76,0.4)] bg-[#0d0d0e] shadow-[0_0_0_1px_rgba(226,87,76,0.08),0_30px_80px_-20px_rgba(0,0,0,0.8)]">
                     <div className="flex shrink-0 items-center gap-2 border-b border-[rgba(226,87,76,0.3)] bg-[linear-gradient(180deg,#201816,#151210)] px-4 py-2.5 font-mono text-[12px] tracking-[0.05em] text-[#e2574c]">
-                      ⚠ &nbsp;PORTFOLIO.EXE HAS STOPPED RESPONDING
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 16 16"
+                        className="h-3.5 w-3.5 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M8 1.7 14.8 13.6A1 1 0 0 1 13.9 15.2H2.1A1 1 0 0 1 1.2 13.6Z" />
+                        <line x1="8" y1="6.1" x2="8" y2="9.4" />
+                        <circle cx="8" cy="11.8" r="0.75" fill="currentColor" stroke="none" />
+                      </svg>
+                      PORTFOLIO.EXE HAS STOPPED RESPONDING
                     </div>
                     <div className="flex min-h-0 flex-1 flex-col px-5 py-5">
                       <div

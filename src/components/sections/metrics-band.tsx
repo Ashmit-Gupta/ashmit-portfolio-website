@@ -1,19 +1,9 @@
-import { MetricCounter } from "@/components/motion/gsap/counter";
-import { Container } from "@/components/ui/container";
-import { homeMetrics } from "@/content/metrics/home-metrics";
+import { ImpactMarquee } from "@/components/sections/impact-marquee";
 
 export function MetricsBand() {
   return (
-    <section className="border-y border-line py-12">
-      <Container className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-        {homeMetrics.map((metric) => (
-          <MetricCounter
-            key={metric.label}
-            value={metric.value}
-            label={metric.label}
-          />
-        ))}
-      </Container>
+    <section className="border-y border-line py-10 sm:py-12">
+      <ImpactMarquee />
     </section>
   );
 }
