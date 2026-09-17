@@ -7,7 +7,7 @@ export const admAmbulanceApps: CaseStudyProject = {
   domains: ["mobile"],
   primaryDomain: "mobile",
   role: "Software engineer",
-  timeframe: "ADM Education and Welfare Society · Oct 2024 – Feb 2025",
+  timeframe: "ADM Education and Welfare Society · Sep 2024 – Feb 2025",
   stack: ["Android", "Kotlin", "SSE", "OpenStreetMap", "Firebase Auth"],
   metrics: [{ label: "Native apps", value: "2" }],
   sections: [

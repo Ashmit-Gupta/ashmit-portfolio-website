@@ -16,8 +16,8 @@ export function ContactSection() {
             If the work maps to a role, write.
           </h2>
           <p className="mt-4 max-w-lg text-muted">
-            I am at IEnergy Digital and open to conversations about senior
-            mobile, applied ML, or platform engineering.
+            Open to conversations about senior mobile, applied ML, or platform
+            engineering.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a

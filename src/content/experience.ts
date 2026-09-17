@@ -22,7 +22,7 @@ export const experience: ExperienceEntry[] = [
     id: "whatbytes",
     company: "WhatBytes",
     role: "Software Engineer",
-    period: "Feb 2025 – July 2025",
+    period: "Feb 2025 – June 2025",
     summary:
       "Refactored a Flutter codebase to Clean Architecture, lifting frame rate ~35% and unit test coverage ~40%.",
     projectSlugs: ["whatbytes-refactor"],
@@ -31,7 +31,7 @@ export const experience: ExperienceEntry[] = [
     id: "adm",
     company: "ADM Education and Welfare Society",
     role: "Software Engineer",
-    period: "Oct 2024 – Feb 2025",
+    period: "Sep 2024 – Feb 2025",
     summary:
       "Built two native Android apps for real-time NGO ambulance dispatch, with live tracking over Server-Sent Events.",
     projectSlugs: ["adm-ambulance-apps"],

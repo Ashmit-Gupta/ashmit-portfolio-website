@@ -7,7 +7,7 @@ export const whatbytesRefactor: CaseStudyProject = {
   domains: ["mobile"],
   primaryDomain: "mobile",
   role: "Software engineer",
-  timeframe: "WhatBytes · Feb 2025 – July 2025",
+  timeframe: "WhatBytes · Feb 2025 – June 2025",
   stack: ["Flutter", "Clean Architecture", "Dependency injection"],
   metrics: [
     { label: "Frame rate", value: "54 FPS" },
